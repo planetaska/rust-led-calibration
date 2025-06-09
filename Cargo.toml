@@ -45,3 +45,10 @@ features = ["critical-section-single-core"]
 
 [profile.release]
 debug = 2
+
+# To solve Can't find crate for 'test' issue for IDE
+# https://github.com/rust-lang/vscode-rust/issues/729
+[[bin]]
+name = "mb2-embassy-rgb"
+test = false
+bench = false

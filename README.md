@@ -7,10 +7,19 @@ of reasonable brightness.
 
 See below for UI.
 
-**XXX This tool is *mostly* finished! Please wire your
-hardware up (see below), finish it, comment it, and use it
-to find good values. Then document those values in this
-README.**
+## Calibration Results
+
+After testing with the MicroBit v2 hardware setup, the following values produce white light:
+
+**RGB brightness levels for producing white light:**
+
+* Red: 13/15
+* Green: 6/15
+* Blue: 10/15
+
+**Minimum frame rate:**
+
+* 60 fps (frames per second) to eliminate visible flicker
 
 ## Build and Run
 

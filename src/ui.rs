@@ -6,7 +6,7 @@
 use crate::*;
 
 /// Internal state for the user interface
-/// 
+///
 /// Tracks current brightness levels and frame rate settings that are
 /// controlled by knob position and button combinations.
 struct UiState {
@@ -18,7 +18,7 @@ struct UiState {
 
 impl UiState {
     /// Display current RGB levels and frame rate via RTT debug output
-    /// 
+    ///
     /// Prints the current state to help users see the effect of their adjustments.
     /// Output format:
     /// ```
@@ -30,7 +30,7 @@ impl UiState {
     fn show(&self) {
         let names = ["red", "green", "blue"];
         rprintln!(); // Blank line for readability
-        // Print each color level
+                     // Print each color level
         for (name, level) in names.iter().zip(self.levels.iter()) {
             rprintln!("{}: {}", name, level);
         }
@@ -40,7 +40,7 @@ impl UiState {
 
 impl Default for UiState {
     /// Create initial UI state with sensible defaults
-    /// 
+    ///
     /// Starts with all colors at maximum brightness (LEVELS-1 = 15)
     /// and a moderate frame rate of 100 fps.
     fn default() -> Self {
@@ -53,7 +53,7 @@ impl Default for UiState {
 }
 
 /// User interface controller for RGB calibration
-/// 
+///
 /// Manages knob input and button states to control which parameter
 /// the knob adjusts. Button combinations determine the control mode:
 /// - No buttons: Frame rate control (10-160 fps in steps of 10)
@@ -73,12 +73,12 @@ pub struct Ui {
 
 impl Ui {
     /// Create a new UI controller with specified hardware interfaces
-    /// 
+    ///
     /// # Arguments
     /// * `knob` - Calibrated potentiometer interface
     /// * `button_a` - MicroBit button A for mode selection
     /// * `button_b` - MicroBit button B for mode selection
-    /// 
+    ///
     /// # Returns
     /// New UI controller with default initial state
     pub fn new(knob: Knob, button_a: Button, button_b: Button) -> Self {
@@ -91,13 +91,13 @@ impl Ui {
     }
 
     /// Convert knob level (0-15) to frame rate (10-160 fps in steps of 10)
-    /// 
+    ///
     /// Maps the 16 knob positions to frame rates from 10 to 160 fps.
     /// Each step increases the frame rate by 10 fps.
-    /// 
+    ///
     /// # Arguments
     /// * `level` - Knob position (0 to LEVELS-1)
-    /// 
+    ///
     /// # Returns
     /// Frame rate in fps (10, 20, 30, ..., 160)
     fn level_to_frame_rate(level: u32) -> u64 {
@@ -105,7 +105,7 @@ impl Ui {
     }
 
     /// Main UI processing loop
-    /// 
+    ///
     /// Handles knob input based on button state:
     /// - No buttons: Frame rate control (10-160 fps in steps of 10)
     /// - A button: Blue brightness control (0-15)
@@ -115,28 +115,28 @@ impl Ui {
         // Initialize state from current knob position
         let initial_level = self.knob.measure().await;
         self.state.frame_rate = Self::level_to_frame_rate(initial_level);
-        
+
         // Initialize shared state
         set_rgb_levels(|rgb| {
             *rgb = self.state.levels;
         })
         .await;
         set_frame_rate(self.state.frame_rate).await;
-        
+
         // Show initial state
         self.state.show();
-        
+
         loop {
             // Read button states
             let button_a_pressed = self.button_a.is_low();
             let button_b_pressed = self.button_b.is_low();
-            
+
             // Read current knob position (0 to LEVELS-1)
             let level = self.knob.measure().await;
-            
+
             // Determine control mode and update appropriate parameter
             let mut state_changed = false;
-            
+
             match (button_a_pressed, button_b_pressed) {
                 (false, false) => {
                     // No buttons: Frame rate control
@@ -169,7 +169,7 @@ impl Ui {
                     }
                 }
             }
-            
+
             // Update shared RGB state if brightness levels changed
             if state_changed {
                 if button_a_pressed || button_b_pressed {
@@ -180,7 +180,7 @@ impl Ui {
                 }
                 self.state.show(); // Display updated state
             }
-            
+
             // Poll at 20Hz (every 50ms) to balance responsiveness and CPU usage
             Timer::after_millis(50).await;
         }

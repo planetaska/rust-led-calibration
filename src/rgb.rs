@@ -11,7 +11,7 @@ use crate::*;
 type RgbPins = [Output<'static, AnyPin>; 3];
 
 /// RGB LED controller using TDM
-/// 
+///
 /// Controls three LED pins with precise timing to create mixed colors.
 /// Each color is displayed for a time proportional to its brightness level.
 pub struct Rgb {
@@ -27,14 +27,14 @@ pub struct Rgb {
 
 impl Rgb {
     /// Calculate tick time in microseconds from frame rate
-    /// 
+    ///
     /// Frame rate determines how many complete RGB scans occur per second.
     /// Each frame has 3 colors × LEVELS brightness steps, so:
     /// tick_time = 1_000_000 μs/sec ÷ (3 colors × frame_rate × LEVELS)
-    /// 
+    ///
     /// # Arguments
     /// * `frame_rate` - Target frames per second
-    /// 
+    ///
     /// # Returns
     /// Microseconds per brightness tick
     fn frame_tick_time(frame_rate: u64) -> u64 {
@@ -42,33 +42,33 @@ impl Rgb {
     }
 
     /// Create a new RGB controller with specified pins and frame rate
-    /// 
+    ///
     /// # Arguments
     /// * `rgb` - Array of GPIO output pins [red, green, blue]
     /// * `frame_rate` - Target refresh rate in frames per second
-    /// 
+    ///
     /// # Returns
     /// New RGB controller instance
     pub fn new(rgb: RgbPins, frame_rate: u64) -> Self {
         let tick_time = Self::frame_tick_time(frame_rate);
         Self {
             rgb,
-            levels: [0; 3],  // Start with all LEDs off
+            levels: [0; 3], // Start with all LEDs off
             tick_time,
         }
     }
 
     /// Execute one time slice for a single LED color
-    /// 
+    ///
     /// This implements pulse-width modulation by turning the LED on for a time
     /// proportional to its brightness level, then off for the remaining time.
     /// Total time per step is always the same to maintain consistent frame rate.
-    /// 
+    ///
     /// # Arguments
     /// * `led` - LED index (0=red, 1=green, 2=blue)
     async fn step(&mut self, led: usize) {
         let level = self.levels[led];
-        
+
         // Turn LED on for time proportional to brightness level
         if level > 0 {
             self.rgb[led].set_high();
@@ -76,7 +76,7 @@ impl Rgb {
             Timer::after_micros(on_time).await;
             self.rgb[led].set_low();
         }
-        
+
         // Turn LED off for remaining time to complete the time slice
         let off_level = LEVELS - level;
         if off_level > 0 {
@@ -86,7 +86,7 @@ impl Rgb {
     }
 
     /// Main RGB scanning loop
-    /// 
+    ///
     /// Continuously cycles through red, green, and blue LEDs, displaying each
     /// for a time proportional to its brightness setting. Updates brightness
     /// levels and frame rate from shared state each frame to maintain
@@ -95,7 +95,7 @@ impl Rgb {
         loop {
             // Get latest brightness levels from UI
             self.levels = get_rgb_levels().await;
-            
+
             // Get current frame rate and update tick time if changed
             let current_frame_rate = get_frame_rate().await;
             let expected_tick_time = Self::frame_tick_time(current_frame_rate);

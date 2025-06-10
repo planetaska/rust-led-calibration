@@ -2,7 +2,7 @@
 //!
 //! This embedded Rust application runs on a MicroBit v2 to calibrate RGB LED timing
 //! for creating white light using time-division multiplexing. The tool allows adjusting
-//! frame rate and individual color brightness levels to find optimal values for 
+//! frame rate and individual color brightness levels to find optimal values for
 //! producing visually white light from an RGB LED without current-limiting resistors.
 //!
 //! # Hardware Setup
@@ -59,7 +59,7 @@ pub static FRAME_RATE: Mutex<ThreadModeRawMutex, u64> = Mutex::new(100);
 pub const LEVELS: u32 = 16;
 
 /// Safely read the current RGB brightness levels from shared state
-/// 
+///
 /// Returns: Array of [red, green, blue] brightness values (0-15)
 async fn get_rgb_levels() -> [u32; 3] {
     let rgb_levels = RGB_LEVELS.lock().await;
@@ -67,7 +67,7 @@ async fn get_rgb_levels() -> [u32; 3] {
 }
 
 /// Safely modify the RGB brightness levels in shared state
-/// 
+///
 /// # Arguments
 /// * `setter` - Closure that modifies the RGB levels array
 async fn set_rgb_levels<F>(setter: F)
@@ -79,7 +79,7 @@ where
 }
 
 /// Safely read the current frame rate from shared state
-/// 
+///
 /// Returns: Current frame rate in frames per second
 async fn get_frame_rate() -> u64 {
     let frame_rate = FRAME_RATE.lock().await;
@@ -87,7 +87,7 @@ async fn get_frame_rate() -> u64 {
 }
 
 /// Safely modify the frame rate in shared state
-/// 
+///
 /// # Arguments
 /// * `new_rate` - New frame rate in frames per second
 async fn set_frame_rate(new_rate: u64) {
@@ -96,7 +96,7 @@ async fn set_frame_rate(new_rate: u64) {
 }
 
 /// Main entry point for the RGB LED calibration application
-/// 
+///
 /// Sets up hardware peripherals and launches concurrent RGB and UI tasks.
 /// The function never returns (indicated by `!` return type).
 #[embassy_executor::main]
@@ -113,10 +113,10 @@ async fn main(_spawner: Spawner) -> ! {
 
     // Configure GPIO pins for RGB LED control (active high, standard drive)
     let led_pin = |p| Output::new(p, Level::Low, OutputDrive::Standard);
-    let red = led_pin(AnyPin::from(board.p9));    // Red LED on pin P9
-    let green = led_pin(AnyPin::from(board.p8));  // Green LED on pin P8  
-    let blue = led_pin(AnyPin::from(board.p16));  // Blue LED on pin P16
-    // Create RGB controller with 100 fps initial frame rate
+    let red = led_pin(AnyPin::from(board.p9)); // Red LED on pin P9
+    let green = led_pin(AnyPin::from(board.p8)); // Green LED on pin P8
+    let blue = led_pin(AnyPin::from(board.p16)); // Blue LED on pin P16
+                                                 // Create RGB controller with 100 fps initial frame rate
     let rgb: Rgb = Rgb::new([red, green, blue], 100);
 
     // Configure ADC for potentiometer reading with 14-bit resolution

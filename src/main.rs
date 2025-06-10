@@ -51,6 +51,10 @@ use num_traits::float::FloatCore;
 /// Protected by mutex for safe access between async tasks
 pub static RGB_LEVELS: Mutex<ThreadModeRawMutex, [u32; 3]> = Mutex::new([0; 3]);
 
+/// Global shared state for frame rate (frames per second)
+/// Protected by mutex for safe access between async tasks
+pub static FRAME_RATE: Mutex<ThreadModeRawMutex, u64> = Mutex::new(100);
+
 /// Number of brightness levels per color (0-15, giving 16 total levels)
 pub const LEVELS: u32 = 16;
 
@@ -72,6 +76,23 @@ where
 {
     let mut rgb_levels = RGB_LEVELS.lock().await;
     setter(&mut rgb_levels);
+}
+
+/// Safely read the current frame rate from shared state
+/// 
+/// Returns: Current frame rate in frames per second
+async fn get_frame_rate() -> u64 {
+    let frame_rate = FRAME_RATE.lock().await;
+    *frame_rate
+}
+
+/// Safely modify the frame rate in shared state
+/// 
+/// # Arguments
+/// * `new_rate` - New frame rate in frames per second
+async fn set_frame_rate(new_rate: u64) {
+    let mut frame_rate = FRAME_RATE.lock().await;
+    *frame_rate = new_rate;
 }
 
 /// Main entry point for the RGB LED calibration application

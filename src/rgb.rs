@@ -89,13 +89,21 @@ impl Rgb {
     /// 
     /// Continuously cycles through red, green, and blue LEDs, displaying each
     /// for a time proportional to its brightness setting. Updates brightness
-    /// levels from shared state each frame.
+    /// levels and frame rate from shared state each frame to maintain
+    /// consistent timing.
     /// 
     /// The loop never returns, indicated by the `!` return type.
     pub async fn run(mut self) -> ! {
         loop {
             // Get latest brightness levels from UI
             self.levels = get_rgb_levels().await;
+            
+            // Get current frame rate and update tick time if changed
+            let current_frame_rate = get_frame_rate().await;
+            let expected_tick_time = Self::frame_tick_time(current_frame_rate);
+            if self.tick_time != expected_tick_time {
+                self.tick_time = expected_tick_time;
+            }
 
             // Scan through each color: red (0), green (1), blue (2)
             for led in 0..3 {

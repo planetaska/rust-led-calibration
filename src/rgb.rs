@@ -1,6 +1,6 @@
 //! RGB LED Time-Division Multiplexing Controller
 //!
-//! This module implements time-division multiplexing for RGB LEDs to create
+//! This module implements time-division multiplexing (TDM) for RGB LEDs to create
 //! mixed colors including white. Since only one LED can be on at a time due to
 //! hardware constraints (no current-limiting resistors), rapid switching between
 //! colors creates the illusion of mixed colors through persistence of vision.
@@ -10,7 +10,7 @@ use crate::*;
 /// Type alias for the three RGB LED output pins [red, green, blue]
 type RgbPins = [Output<'static, AnyPin>; 3];
 
-/// RGB LED controller using time-division multiplexing
+/// RGB LED controller using TDM
 /// 
 /// Controls three LED pins with precise timing to create mixed colors.
 /// Each color is displayed for a time proportional to its brightness level.
@@ -85,14 +85,12 @@ impl Rgb {
         }
     }
 
-    /// Main RGB scanning loop - runs forever
+    /// Main RGB scanning loop
     /// 
     /// Continuously cycles through red, green, and blue LEDs, displaying each
     /// for a time proportional to its brightness setting. Updates brightness
     /// levels and frame rate from shared state each frame to maintain
     /// consistent timing.
-    /// 
-    /// The loop never returns, indicated by the `!` return type.
     pub async fn run(mut self) -> ! {
         loop {
             // Get latest brightness levels from UI

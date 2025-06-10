@@ -104,21 +104,13 @@ impl Ui {
         (level as u64 + 1) * 10
     }
 
-    /// Main UI processing loop - runs forever
+    /// Main UI processing loop
     /// 
     /// Handles knob input based on button state:
     /// - No buttons: Frame rate control (10-160 fps in steps of 10)
     /// - A button: Blue brightness control (0-15)
     /// - B button: Green brightness control (0-15)  
     /// - A+B buttons: Red brightness control (0-15)
-    /// 
-    /// The loop:
-    /// 1. Reads button states
-    /// 2. Reads knob position
-    /// 3. Updates appropriate parameter based on button combination
-    /// 4. Updates shared state if values changed
-    /// 5. Displays current state
-    /// 6. Waits 50ms before next reading
     pub async fn run(&mut self) -> ! {
         // Initialize state from current knob position
         let initial_level = self.knob.measure().await;

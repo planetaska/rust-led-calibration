@@ -1,11 +1,11 @@
 # rgbcal: RGB LED calibration tool
 Bart Massey 2024
 
-This tool is designed to find out a decent frame rate and
-maximum RGB component values to produce a white-looking RGB
-of reasonable brightness.
+This tool is designed to find out a decent frame rate and maximum RGB component values to produce a white-looking RGB of reasonable brightness.
 
-See below for UI.
+## Author
+
+Chia-Wei Hsu (chiawei@pdx.edu)
 
 ## Calibration Results
 
@@ -20,6 +20,28 @@ After testing with the MicroBit v2 hardware setup, the following values produce 
 **Minimum frame rate:**
 
 * 60 fps (frames per second) to eliminate visible flicker
+
+## Development Process
+
+### What I Did
+
+I started by reading through the provided documentation and code to fully understand the RGB LED calibration requirements and the time-division multiplexing approach. Once I grasped the concept, I added documentation comments to each block of code to clarify functionality. Then I implemented the missing features including frame rate control via knob when no buttons are pressed, Red/Green LED brightness control using A, B, and A+B button combinations, shared state management between UI and RGB structs, and dynamic tick time adjustment based on frame rate changes.
+
+### How It Went
+
+The biggest challenge was understanding the time-division multiplexing (TDM) concept initially. It took some time to grasp how rapidly switching between RGB channels creates the perception of mixed colors, and how the timing calculations work to maintain consistent brightness levels. Once I understood the underlying principles, implementing the button combinations and shared state management became more straightforward. The Embassy async framework made concurrent task management easier, though I find that debugging timing-sensitive embedded code requires patience.
+
+### Observations
+
+During calibration, I found that LED perception can be quite subjective and depends heavily on viewing angle and diffusion. The LED color changes slightly with different viewing angles, making it tricky to determine a "perfect" white balance. I experimented with different diffusion materials and settled on using a piece of Kleenex to get more consistent readings. I suspect our eye's sensitivity to different colors meant that relatively low green levels were needed to achieve perceived white light.
+
+### Final Thought
+
+This was a fun and engaging assignment that provided hands-on experience with embedded hardware including a breadboard and potentiometer control. It was interesting to see a simulated industry example. I think it demonstrates how real-world constraints often require creative software solutions when hardware designs aren’t optimal. I really appreciated the process of working through a realistic engineering problem from initial understanding through implementation to final results. The project combines embedded programming concepts with practical hardware interfacing, and I find it both educational and enjoyable.
+
+----
+
+*Original document below*
 
 ## Build and Run
 
